@@ -2274,7 +2274,9 @@ class MaskRCNN():
                 print('Re-starting from epoch %d' % self.epoch)
 
         # Directory for training logs
-        self.log_dir = os.path.join(self.model_dir, "{}{:%Y%m%dT%H%M}".format(
+        log_dir = os.path.join(self.model_dir, "logs")
+
+        self.log_dir = os.path.join(self.log_dir, "{}{:%Y%m%dT%H%M}".format(
             self.config.NAME.lower(), now))
 
         # Path to save after each epoch. Include placeholders that get filled by Keras.
