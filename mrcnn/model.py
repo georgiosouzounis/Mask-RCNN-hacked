@@ -1834,6 +1834,7 @@ class MaskRCNN():
         self.config = config
         self.model_dir = model_dir
         self.set_log_dir()
+        self.log_dir = ""
         self.keras_model = self.build(mode=mode, config=config)
 
     def build(self, mode, config):
@@ -2274,10 +2275,10 @@ class MaskRCNN():
                 print('Re-starting from epoch %d' % self.epoch)
 
             # Directory for training logs
-            _log_dir = os.path.join(self.model_path, "logs")
+            _log_dir = os.path.join(model_path, "logs")
         else:
             _log_dir = os.path.join(os.getcwd(), "logs")
-            
+
         self.log_dir = os.path.join(_log_dir, "{}{:%Y%m%dT%H%M}".format(
             self.config.NAME.lower(), now))
 
