@@ -2169,8 +2169,8 @@ class MaskRCNN():
 
         for name in loss_names:
             layer = self.keras_model.get_layer(name)
-            if layer.output in self.keras_model.losses: # is this conflicting?
-                continue
+            #if layer.output in self.keras_model.losses: # is this conflicting?
+            #    continue
             loss = tf.reduce_mean(layer.output, keepdims=True) * self.config.LOSS_WEIGHTS.get(name, 1.)
             self.keras_model.add_loss(loss)
 
