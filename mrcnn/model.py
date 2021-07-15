@@ -2361,9 +2361,9 @@ class MaskRCNN():
         # Work-around for Windows: Keras fails on Windows when using
         # multiprocessing workers. See discussion here:
         # https://github.com/matterport/Mask_RCNN/issues/13#issuecomment-353124009
-        if os.name is 'nt' or _multiprocesing is False:
+        if os.name is 'nt' or _multiprocessing is False:
             workers = 0
-            _multiprocesing = False # incase this is due to OS
+            _multiprocessing = False # incase this is due to OS
         else:
             workers = multiprocessing.cpu_count()
             _multiprocessing = True
