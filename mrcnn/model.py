@@ -252,7 +252,7 @@ def clip_boxes_graph(boxes, window):
     return clipped
 
 
-class ProposalLayer(KE.Layer):
+class ProposalLayer(KL.Layer):
     """Receives anchor scores and selects a subset to pass as proposals
     to the second stage. Filtering is done based on anchor scores and
     non-max suppression to remove overlaps. It also applies bounding
@@ -341,7 +341,7 @@ def log2_graph(x):
     return tf.math.log(x) / tf.math.log(2.0)
 
 
-class PyramidROIAlign(KE.Layer):
+class PyramidROIAlign(KL.Layer):
     """Implements ROI Pooling on multiple levels of the feature pyramid.
 
     Params:
@@ -619,7 +619,7 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
     return rois, roi_gt_class_ids, deltas, masks
 
 
-class DetectionTargetLayer(KE.Layer):
+class DetectionTargetLayer(KL.Layer):
     """Subsamples proposals and generates target box refinement, class_ids,
     and masks for each.
 
@@ -779,7 +779,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     return detections
 
 
-class DetectionLayer(KE.Layer):
+class DetectionLayer(KL.Layer):
     """Takes classified proposal boxes and their bounding box deltas and
     returns the final detection boxes.
 
@@ -2264,8 +2264,9 @@ class MaskRCNN():
                 print('Re-starting from epoch %d' % self.epoch)
 
 
-        #  Directory for training logs
-        self.log_dir = os.path.join(self.model_dir, "log/")
+        # Directory for training logs
+        # hardwire the "logs/" so that symbolic links can be created before model training
+        self.log_dir = os.path.join(self.model_dir, "log/") 
         self.log_dir = os.path.join(self.log_dir, "{}{:%Y%m%dT%H%M}".format(
             self.config.NAME.lower(), now))
         # Path to save after each epoch. Include placeholders that get filled by Keras.
@@ -2275,7 +2276,7 @@ class MaskRCNN():
             "*epoch*", "{epoch:04d}")
 
     def train(self, train_dataset, val_dataset, learning_rate, epochs, layers,
-              augmentation=None, custom_callbacks=None, no_augmentation_sources=None):
+              augmentation=None, custom_callbacks=None, no_augmentation_sources=None, _multiprocessing=True):
         """Train the model.
         train_dataset, val_dataset: Training and validation Dataset objects.
         learning_rate: The learning rate to train with
@@ -2307,6 +2308,9 @@ class MaskRCNN():
         no_augmentation_sources: Optional. List of sources to exclude for
             augmentation. A source is string that identifies a dataset and is
             defined in the Dataset class.
+        _multiprocessing: flag to enable/disable multiprocessing in the 
+            model.fit_generator(). Set this to False if given errors such as:
+            'TypeError: Can't pickle _thread.lock objects'
         """
         assert self.mode == "training", "Create model in training mode."
 
@@ -2357,10 +2361,12 @@ class MaskRCNN():
         # Work-around for Windows: Keras fails on Windows when using
         # multiprocessing workers. See discussion here:
         # https://github.com/matterport/Mask_RCNN/issues/13#issuecomment-353124009
-        if os.name is 'nt':
+        if os.name is 'nt' or _multiprocesing is False:
             workers = 0
+            _multiprocesing = False # incase this is due to OS
         else:
             workers = multiprocessing.cpu_count()
+            _multiprocessing = True
 
         self.keras_model.fit_generator(
             train_generator,
@@ -2372,7 +2378,7 @@ class MaskRCNN():
             validation_steps=self.config.VALIDATION_STEPS,
             max_queue_size=100,
             workers=workers,
-            use_multiprocessing=True,
+            use_multiprocessing=_multiprocessing,
         )
         self.epoch = max(self.epoch, epochs)
 
