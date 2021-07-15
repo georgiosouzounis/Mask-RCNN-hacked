@@ -252,7 +252,7 @@ def clip_boxes_graph(boxes, window):
     return clipped
 
 
-class ProposalLayer(KL.Layer):
+class ProposalLayer(KE.Layer):
     """Receives anchor scores and selects a subset to pass as proposals
     to the second stage. Filtering is done based on anchor scores and
     non-max suppression to remove overlaps. It also applies bounding
@@ -341,7 +341,7 @@ def log2_graph(x):
     return tf.math.log(x) / tf.math.log(2.0)
 
 
-class PyramidROIAlign(KL.Layer):
+class PyramidROIAlign(KE.Layer):
     """Implements ROI Pooling on multiple levels of the feature pyramid.
 
     Params:
@@ -619,7 +619,7 @@ def detection_targets_graph(proposals, gt_class_ids, gt_boxes, gt_masks, config)
     return rois, roi_gt_class_ids, deltas, masks
 
 
-class DetectionTargetLayer(KL.Layer):
+class DetectionTargetLayer(KE.Layer):
     """Subsamples proposals and generates target box refinement, class_ids,
     and masks for each.
 
@@ -779,7 +779,7 @@ def refine_detections_graph(rois, probs, deltas, window, config):
     return detections
 
 
-class DetectionLayer(KL.Layer):
+class DetectionLayer(KE.Layer):
     """Takes classified proposal boxes and their bounding box deltas and
     returns the final detection boxes.
 
@@ -2265,7 +2265,7 @@ class MaskRCNN():
 
 
         # Directory for training logs
-        # hardwire the "logs/" so that symbolic links can be created before model training
+        # hardwire the "logs/" so that symbolic links can be created before train
         self.log_dir = os.path.join(self.model_dir, "log/") 
         self.log_dir = os.path.join(self.log_dir, "{}{:%Y%m%dT%H%M}".format(
             self.config.NAME.lower(), now))
