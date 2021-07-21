@@ -2203,6 +2203,9 @@ class MaskRCNN():
     def plot(self):
         plot_model(self.keras_model, to_file='model_plot.png', show_shapes=True, show_layer_names=True)
 
+    def summary(self):
+      print(self.keras_model.summary())
+
     def set_trainable(self, layer_regex, keras_model=None, indent=0, verbose=1):
         """Sets model layers as trainable if their names match
         the given regular expression.
